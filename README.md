@@ -1,2 +1,2 @@
-# sql
-sql code 
+# SQL
+SQL code cuả Hiền
