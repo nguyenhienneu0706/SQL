@@ -54,7 +54,6 @@ FROM
 
 -- LẤY DOANH THU TỪNG KÊNH QUẢNG CÁO CỦA GAME ALO NGÀY 25/05/23 (TRONG TRƯỜNG HỢP K BỊ DUP DỮ LIỆU)
 SELECT
-  DISTINCT TRANS.transaction.id AS ID,
   LOGIN.media_source,
   SUM(TRANS.transaction.amount) AS Total_amount
 FROM `gamotasdk5.bidata.transactions` AS TRANS
