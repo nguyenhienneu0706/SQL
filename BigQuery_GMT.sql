@@ -52,7 +52,9 @@ FROM
   `gamotasdk5.bidata.transactions`;  
 -- Kết quả: 34238 
 
--- LẤY DOANH THU TỪNG KÊNH QUẢNG CÁO CỦA GAME ALO NGÀY 25/05/23 (TRONG TRƯỜNG HỢP K BỊ DUP DỮ LIỆU)
+/* LẤY DOANH THU TỪNG KÊNH QUẢNG CÁO CỦA GAME ALO NGÀY 25/05/23 (TRONG TRƯỜNG HỢP K BỊ DUP DỮ LIỆU)
+Doanh thu ghi nhận là doanh thu của những user mà có login vào ngày 25 và nạp luôn ngày 25, thiếu đi những user k login nhưng vẫn nạp (ví dụ nạp qua trang nạp, ...) */
+
 SELECT
   LOGIN.media_source,
   SUM(TRANS.transaction.amount) AS Total_amount
@@ -65,6 +67,13 @@ GROUP BY LOGIN.media_source
 ORDER BY Total_amount DESC; 
 
 -- LẤY DOANH THU TỪNG KÊNH QUẢNG CÁO CỦA GAME ALO NGÀY 25/05/23 (TRONG TRƯỜNG HỢP CÓ BỊ DUP DỮ LIỆU) - CÁCH NGU NGỐC CỦA HIỀN
+
+/* Doanh thu ghi nhận là doanh thu của những user mà có login vào ngày 25 và nạp luôn ngày 25, thiếu đi những user k login nhưng vẫn nạp (ví dụ nạp qua trang nạp, ...)
+
+Vì ý nghĩa ngày trong bảng transactions và bảng appsflyer_login_postback là khác nhau:
+- Bảng Trans: Mỗi giao dịch nạp ghi nhận một bản ghi (nhưng do bị dup dữ liệu nên mỗi giao dịch thường sẽ bị x nhiều lần nên => muốn sử dụng chính xác phải lấy distinct transaction_id)
+- Bảng appsflyer_login_postback mỗi lần user nào đó login ghi nhận 1 bản ghi, nếu users đó vào nhiều lần trong ngày thì ghi nhận nhiều bản ghi nên khi join qua bảng transactions thì sẽ 1 users giao dịch (unique) sẽ tương ứng với nhiều lần vào (mỗi lần vào tính doanh thu 1 lần) nên doanh thu từng user sẽ bị nhân lên -> để sử dụng đúng chỉ tính mỗi user coi như vào 1 lần => distinct user_id */ 
+
 WITH TRANS AS (
 SELECT
   user.user_id,
@@ -104,6 +113,12 @@ GROUP BY AF_LOGIN.media_source
 ORDER BY Total_amount DESC; 
 
 -- LẤY DOANH THU TỪNG KÊNH QUẢNG CÁO CỦA GAME ALO NGÀY 25/05/23 (TRONG TRƯỜNG HỢP CÓ BỊ DUP DỮ LIỆU)
+/* Doanh thu ghi nhận là doanh thu của những user mà có login vào ngày 25 và nạp luôn ngày 25, thiếu đi những user k login nhưng vẫn nạp (ví dụ nạp qua trang nạp, ...)
+
+Vì ý nghĩa ngày trong bảng transactions và bảng appsflyer_login_postback là khác nhau:
+- Bảng Trans: Mỗi giao dịch nạp ghi nhận một bản ghi (nhưng do bị dup dữ liệu nên mỗi giao dịch thường sẽ bị x nhiều lần nên => muốn sử dụng chính xác phải lấy distinct transaction_id)
+- Bảng appsflyer_login_postback mỗi lần user nào đó login ghi nhận 1 bản ghi, nếu users đó vào nhiều lần trong ngày thì ghi nhận nhiều bản ghi nên khi join qua bảng transactions thì sẽ 1 users giao dịch (unique) sẽ tương ứng với nhiều lần vào (mỗi lần vào tính doanh thu 1 lần) nên doanh thu từng user sẽ bị nhân lên -> để sử dụng đúng chỉ tính mỗi user coi như vào 1 lần => distinct user_id */ 
+
 WITH TRANS AS (
 SELECT
   DISTINCT (transaction.id),
