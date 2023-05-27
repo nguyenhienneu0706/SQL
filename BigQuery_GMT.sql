@@ -57,14 +57,14 @@ Doanh thu ghi nhận là doanh thu của những user mà có login vào ngày 2
 
 SELECT
   LOGIN.media_source,
-  SUM(TRANS.transaction.amount) AS Total_amount
+  SUM(TRANS.transaction.amount_local) AS Total_amount_local
 FROM `gamotasdk5.bidata.transactions` AS TRANS
   LEFT JOIN `gamotasdk5.bidata.appsflyer_login_postback` AS LOGIN
   ON TRANS.user.user_id = LOGIN.user_id
 WHERE TRANS.app.game_id = 180941
   AND TRANS.date = "2023-05-25"
 GROUP BY LOGIN.media_source
-ORDER BY Total_amount DESC; 
+ORDER BY Total_amount_local DESC; 
 
 -- LẤY DOANH THU TỪNG KÊNH QUẢNG CÁO CỦA GAME ALO NGÀY 25/05/23 (TRONG TRƯỜNG HỢP CÓ BỊ DUP DỮ LIỆU) - CÁCH NGU NGỐC CỦA HIỀN
 
@@ -78,7 +78,7 @@ WITH TRANS AS (
 SELECT
   user.user_id,
   transaction.id,
-  transaction.amount AS Amount,
+  transaction.amount_local AS Amount_local,
   created
 FROM
   `gamotasdk5.bidata.transactions`
@@ -86,7 +86,7 @@ WHERE Date = "2023-05-25" AND app.game_id = 180941
 GROUP BY
   user.user_id,
   transaction.id,
-  Amount,
+  Amount_local,
   created -- có thể bỏ đi (để vào cho chắc hoi)
 )-- 634 rows trong khi nếu không distinct sẽ là 1263 rows
 , 
@@ -105,7 +105,7 @@ appsflyer_id, bundle_id, ip, city, country_code
 )
 SELECT 
 AF_LOGIN.media_source,
-  SUM(Amount) AS Total_amount
+  SUM(Amount_local) AS Total_amount
 FROM TRANS
   LEFT JOIN AF_LOGIN
   ON TRANS.user_id = AF_LOGIN.user_id
@@ -123,7 +123,7 @@ WITH TRANS AS (
 SELECT
   DISTINCT (transaction.id),
    user.user_id,
-  transaction.amount AS Amount
+  transaction.amount_local AS Amount_local
 FROM
   `gamotasdk5.bidata.transactions`
 WHERE Date = "2023-05-25" AND app.game_id = 180941 
@@ -139,7 +139,7 @@ WHERE Date = "2023-05-25" AND game_id = 180941
 )
 SELECT 
 AF_LOGIN.media_source,
-  SUM(Amount) AS Total_amount
+  SUM(Amount_local) AS Total_amount
 FROM TRANS
   LEFT JOIN AF_LOGIN
   ON TRANS.user_id = AF_LOGIN.user_id
