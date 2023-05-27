@@ -145,3 +145,13 @@ FROM TRANS
   ON TRANS.user_id = AF_LOGIN.user_id
 GROUP BY AF_LOGIN.media_source
 ORDER BY Total_amount DESC; 
+
+-- LẤY RA TẤT CẢ CAC TRƯỜNG THÔNG TIN CẦN THIẾT TRONG BẢNG TRANSACTIONS MÀ KHÔNG BỊ DUP DỮ LIỆU:
+SELECT
+  DISTINCT (transaction.id),
+  date, 
+  user.user_id,user.role_id, user.server_id,
+  transaction.type,transaction.vendor,
+  transaction.amount_local AS Amount_local,
+  app.app_id, app.game_id, app.platform, app.market
+FROM `gamotasdk5.bidata.transactions`;
