@@ -25,43 +25,37 @@ FROM
 SELECT COUNT(DISTINCT user_id)
 FROM 
   `gamotasdk5.bidata.register_logs`
-WHERE Date = "2023-05-22"
-LIMIT 1000;  
--- Kết quả: 257121
+WHERE Date = "2023-05-22";
+-- Kết quả: 7560
 
 SELECT COUNT(DISTINCT userinfo.user_id)
 FROM 
   `gamotasdk5.bidata.login_logs`
-WHERE Date = "2023-05-22"
-LIMIT 1000;
+WHERE Date = "2023-05-22";
 -- Kết quả: 232313 
 
 SELECT COUNT(DISTINCT user_id)
 FROM 
   `gamotasdk5.bidata.appsflyer_login_postback`
-WHERE Date = "2023-05-22"
-LIMIT 1000; 
+WHERE Date = "2023-05-22"; 
 -- Kết quả: 223380
 
 SELECT COUNT(DISTINCT user_id)
 FROM 
   `gamotasdk5.bidata.game_roles`
-WHERE Date = "2023-05-22"
-LIMIT 1000;
+WHERE Date = "2023-05-22";
 -- Kết quả: 187790
 
 SELECT COUNT(DISTINCT userinfo.user_id)
 FROM 
   `gamotasdk5.bidata.open_logs`
-WHERE Date = "2023-05-22"
-LIMIT 1000;
+WHERE Date = "2023-05-22";
 -- Kết quả: 134632
 
 SELECT COUNT(DISTINCT user.user_id)
 FROM 
   `gamotasdk5.bidata.transactions`
-WHERE Date = "2023-05-22"
-LIMIT 1000;
+WHERE Date = "2023-05-22";
 -- Kết quả: 34238 
 
 /* LẤY DOANH THU TỪNG KÊNH QUẢNG CÁO CỦA GAME ALO NGÀY 25/05/23 (TRONG TRƯỜNG HỢP K BỊ DUP DỮ LIỆU)
