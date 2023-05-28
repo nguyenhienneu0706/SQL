@@ -42,15 +42,15 @@ WHERE Date = "2023-05-22";
 
 SELECT COUNT(DISTINCT user_id)
 FROM 
-  `gamotasdk5.bidata.register_logs`
-WHERE Date = "2023-05-22";
--- Kết quả: 7560
+  `gamotasdk5.bidata.game_roles`
+WHERE DATE(Date) = "2023-05-22"; -- Trường Date chưa có, chỉ có Datetime
+-- Kết quả: 8337
 
 SELECT COUNT(DISTINCT user_id)
 FROM 
-  `gamotasdk5.bidata.game_roles`
-WHERE LEFT(Date, 10) = "2023-05-22"; -- Trường Date chưa có, chỉ có Datetime
--- Kết quả: chưa có
+  `gamotasdk5.bidata.register_logs`
+WHERE Date = "2023-05-22";
+-- Kết quả: 7560
 
 SELECT COUNT(DISTINCT user.user_id)
 FROM 
