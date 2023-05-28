@@ -58,7 +58,7 @@ FROM
 WHERE Date = "2023-05-22";
 -- Kết quả: 1930 
 
--- CHỐT LẠI: login_logs -> appsflyer_login_postback -> open_logs -> register_logs -> transactions... CHÚ Ý: game_roles CHƯA BIẾT XẾP VÀO ĐOẠN NÀO
+-- CHỐT LẠI: login_logs -> appsflyer_login_postback -> open_logs -> game_roles -> register_logs -> transactions
 
 /* LẤY DOANH THU TỪNG KÊNH QUẢNG CÁO CỦA GAME ALO NGÀY 25/05/23 (TRONG TRƯỜNG HỢP K BỊ DUP DỮ LIỆU)
 Doanh thu ghi nhận là doanh thu của những user mà có login vào ngày 25 và nạp luôn ngày 25, thiếu đi những user k login nhưng vẫn nạp (ví dụ nạp qua trang nạp, ...) */
