@@ -185,6 +185,7 @@ ORDER BY login_date ASC;
 -- Kết quả trả về là Active User (check với Ana chỉ số DAU không chênh lệch nhiều)
 
 -- Sau đó tạo ra bằng chứa cả ngày login và ngày login đầu tiên bằng cách tìm ra ngày login đầu tiên của user đó, với điều kiện lần đăng nhập đầu tiên < khoảng thời gian là ok
+-- Bước 1: Tạo ra bảng chứa dữ liệu
 -- CÁCH 1:
 WITH FIRST_LOGIN AS (
   SELECT userinfo.user_id, MIN(Date) AS first_login_date
@@ -212,9 +213,10 @@ FROM `gamotasdk5.bidata.login_logs` AS LOGIN
 FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.userinfo.user_id
 WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27");
 
--- 2. LẤY RA ACTIVE OLD USER:
+-- Bước 2: Lấy ra AOU
 -- Cách 1: (chưa hoàn thiện)
-WITH FIRST_LOGIN AS (
+WITH A AS (
+  WITH FIRST_LOGIN AS (
   SELECT userinfo.user_id, MIN(Date) AS first_login_date
   FROM `gamotasdk5.bidata.login_logs`
   WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
@@ -226,7 +228,12 @@ WITH FIRST_LOGIN AS (
 )
 SELECT LOGIN.user_id, LOGIN.login_date, FIRST_LOGIN.first_login_date
 FROM LOGIN
-FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.user_id;
+FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.user_id
+)
+SELECT login_date, COUNT(DISTINCT user_id)
+FROM A
+WHERE login_date > first_login_date
+GROUP BY login_date;
 
 -- Cách 2:
 SELECT A.Date, COUNT(DISTINCT A.user_id)
