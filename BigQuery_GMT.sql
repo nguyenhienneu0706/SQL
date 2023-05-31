@@ -168,7 +168,7 @@ FROM `gamotasdk5.bidata.transactions`;
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ----------------- TASK STICKINESS ------------- 
 
--- 1. LẤY RA ACTIVE OLD USER:
+-- 1. LẤY RA ACTIVE USER:
 
 -- Thử bảng login_logs:
 WITH LOGIN AS (
@@ -212,9 +212,7 @@ FROM `gamotasdk5.bidata.login_logs` AS LOGIN
 FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.userinfo.user_id
 WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27");
 
--- Để tìm được AOU bằng cách tìm ra ngày login đầu tiên của user đó, với điều kiện lần đăng nhập đầu tiên < khoảng thời gian là ok:
-
--- ACTIVE OLD USER:
+-- 2. LẤY RA ACTIVE OLD USER:
 -- Cách 1: (chưa hoàn thiện)
 WITH FIRST_LOGIN AS (
   SELECT userinfo.user_id, MIN(Date) AS first_login_date
