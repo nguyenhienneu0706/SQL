@@ -185,6 +185,7 @@ ORDER BY login_date ASC;
 -- Kết quả trả về là Active User (check với Ana chỉ số DAU không chênh lệch nhiều)
 
 -- Sau đó tạo ra bằng chứa cả ngày login và ngày login đầu tiên bằng cách tìm ra ngày login đầu tiên của user đó, với điều kiện lần đăng nhập đầu tiên < khoảng thời gian là ok
+-- CÁCH 1:
 WITH FIRST_LOGIN AS (
   SELECT userinfo.user_id, MIN(Date) AS first_login_date
   FROM `gamotasdk5.bidata.login_logs`
@@ -199,7 +200,21 @@ SELECT LOGIN.user_id, LOGIN.login_date, FIRST_LOGIN.first_login_date
 FROM LOGIN
 FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.user_id;
 
+-- CÁCH 2:
+WITH FIRST_LOGIN AS (
+SELECT userinfo.user_id, MIN(Date) AS first_login_date
+FROM `gamotasdk5.bidata.login_logs`
+WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+GROUP BY userinfo.user_id
+)
+SELECT LOGIN.userinfo.user_id, LOGIN.date, FIRST_LOGIN.first_login_date
+FROM `gamotasdk5.bidata.login_logs` AS LOGIN
+FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.userinfo.user_id
+WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27");
+
 -- Để tìm được AOU bằng cách tìm ra ngày login đầu tiên của user đó, với điều kiện lần đăng nhập đầu tiên < khoảng thời gian là ok:
+  WHERE LOGIN.login_date > FIRST_LOGIN.first_login_date
+
 
 
 
