@@ -214,7 +214,7 @@ FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.userinfo.user_id
 WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27");
 
 -- Bước 2: Lấy ra AOU
--- Cách 1: (chưa hoàn thiện)
+-- Cách 1:
 WITH A AS (
   WITH FIRST_LOGIN AS (
   SELECT userinfo.user_id, MIN(Date) AS first_login_date
@@ -245,12 +245,12 @@ FROM `gamotasdk5.bidata.login_logs`
 WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
 GROUP BY userinfo.user_id
 )
-SELECT LOGIN.userinfo.user_id, LOGIN.date, FIRST_LOGIN.first_login_date
+SELECT LOGIN.userinfo.user_id, LOGIN.Date, FIRST_LOGIN.first_login_date
 FROM `gamotasdk5.bidata.login_logs` AS LOGIN
 FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.userinfo.user_id
 WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
 ) AS A
-WHERE A.date > A.first_login_date
+WHERE A.Date > A.First_login_date
 GROUP BY A.Date;
 
 
