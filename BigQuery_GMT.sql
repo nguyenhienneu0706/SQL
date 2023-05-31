@@ -213,7 +213,44 @@ FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.userinfo.user_id
 WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27");
 
 -- Để tìm được AOU bằng cách tìm ra ngày login đầu tiên của user đó, với điều kiện lần đăng nhập đầu tiên < khoảng thời gian là ok:
-  WHERE LOGIN.login_date > FIRST_LOGIN.first_login_date
+
+-- ACTIVE OLD USER:
+-- Cách 1: (chưa hoàn thiện)
+WITH FIRST_LOGIN AS (
+  SELECT userinfo.user_id, MIN(Date) AS first_login_date
+  FROM `gamotasdk5.bidata.login_logs`
+  WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+  GROUP BY userinfo.user_id
+), LOGIN AS (
+  SELECT userinfo.user_id, Date AS login_date
+  FROM `gamotasdk5.bidata.login_logs`
+  WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+)
+SELECT LOGIN.user_id, LOGIN.login_date, FIRST_LOGIN.first_login_date
+FROM LOGIN
+FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.user_id;
+
+-- Cách 2:
+SELECT A.Date, COUNT(DISTINCT A.user_id)
+FROM
+(
+WITH FIRST_LOGIN AS (
+SELECT userinfo.user_id, MIN(Date) AS first_login_date
+FROM `gamotasdk5.bidata.login_logs`
+WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+GROUP BY userinfo.user_id
+)
+SELECT LOGIN.userinfo.user_id, LOGIN.date, FIRST_LOGIN.first_login_date
+FROM `gamotasdk5.bidata.login_logs` AS LOGIN
+FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.userinfo.user_id
+WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+) AS A
+WHERE A.date > A.first_login_date
+GROUP BY A.Date;
+
+
+
+
 
 
 
