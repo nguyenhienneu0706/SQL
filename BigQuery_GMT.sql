@@ -164,3 +164,43 @@ SELECT
   transaction.amount_local AS Amount_local,
   app.app_id, app.game_id, app.platform, app.market
 FROM `gamotasdk5.bidata.transactions`;
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+----------------- TASK STICKINESS ------------- 
+
+-- 1. LẤY RA ACTIVE OLD USER:
+
+-- Thử bảng login_logs:
+WITH LOGIN AS (
+  SELECT userinfo.user_id, date AS login_date
+  FROM `gamotasdk5.bidata.login_logs`
+  WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-28")
+  -- Mình muốn lấy Old User chỉ cần lấy những thằng đã từng có đăng nhập trước đó là được
+)
+SELECT LOGIN.login_date,
+  COUNT(DISTINCT user_id) AS AU
+FROM LOGIN 
+GROUP BY LOGIN.login_date
+ORDER BY login_date ASC;
+-- Kết quả trả về là Active User (check với Ana chỉ số DAU không chênh lệch nhiều)
+
+-- Sau đó tạo ra bằng chứa cả ngày login và ngày login đầu tiên bằng cách tìm ra ngày login đầu tiên của user đó, với điều kiện lần đăng nhập đầu tiên < khoảng thời gian là ok
+WITH FIRST_LOGIN AS (
+  SELECT userinfo.user_id, MIN(Date) AS first_login_date
+  FROM `gamotasdk5.bidata.login_logs`
+  WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+  GROUP BY userinfo.user_id
+), LOGIN AS (
+  SELECT userinfo.user_id, Date AS login_date
+  FROM `gamotasdk5.bidata.login_logs`
+  WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+)
+SELECT LOGIN.user_id, LOGIN.login_date, FIRST_LOGIN.first_login_date
+FROM LOGIN
+FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.user_id;
+
+-- Để tìm được AOU bằng cách tìm ra ngày login đầu tiên của user đó, với điều kiện lần đăng nhập đầu tiên < khoảng thời gian là ok:
+
+
+
+
