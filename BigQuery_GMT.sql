@@ -253,7 +253,36 @@ WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27
 WHERE A.Date > A.First_login_date
 GROUP BY A.Date;
 
+-- Lấy ra danh sách nạp (transactions) không bị dup dữ liệu:
+WITH T_DISTINCT AS (
+SELECT
+  DISTINCT (transaction.id),
+  user.user_id,
+  date
+FROM `gamotasdk5.bidata.transactions`
+WHERE app.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+AND transaction.vendor != "gamota_tester"
+)
+SELECT 
+  date,
+  COUNT (DISTINCT user_id) AS PU
+  FROM T_DISTINCT
+  GROUP BY Date
+  ORDER BY Date ASC;
 
+-- Lấy ra số PU không bị dup dữ liệu:
+WITH T_DISTINCT AS (
+SELECT
+  DISTINCT (transaction.id),
+  user.user_id,
+  date
+FROM `gamotasdk5.bidata.transactions`
+WHERE app.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+AND transaction.vendor != "gamota_tester"
+)
+SELECT 
+  COUNT (DISTINCT user_id) AS PU
+  FROM T_DISTINCT;
 
 
 
