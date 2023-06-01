@@ -214,7 +214,7 @@ FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = LOGIN.userinfo.user_id
 WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27");
 
 -- Bước 2: Lấy ra AOU
--- Cách 1:
+-- Cách 1: (CHƯA TỐI ƯU TỐT)
 WITH A AS (
   WITH FIRST_LOGIN AS (
   SELECT userinfo.user_id, MIN(Date) AS first_login_date
@@ -253,6 +253,26 @@ WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27
 WHERE A.Date > A.First_login_date
 GROUP BY A.Date;
 
+-- CÁCH 3: 
+WITH FIRST_LOGIN AS (
+SELECT userinfo.user_id, MIN(Date) AS first_login_date
+FROM `gamotasdk5.bidata.login_logs`
+WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+GROUP BY userinfo.user_id
+),
+LOGIN AS (
+SELECT userinfo.user_id, Date, FIRST_LOGIN.first_login_date
+FROM `gamotasdk5.bidata.login_logs` 
+FULL JOIN FIRST_LOGIN ON FIRST_LOGIN.user_id = userinfo.user_id
+WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+)
+SELECT A.Date, COUNT(DISTINCT A.user_id)
+FROM LOGIN AS A
+WHERE A.Date > A.First_login_date
+GROUP BY A.Date;
+
+
+-- TASK KHÁC TRUNG HỎI:
 -- Lấy ra danh sách nạp (transactions) không bị dup dữ liệu:
 WITH T_DISTINCT AS (
 SELECT
