@@ -34,3 +34,18 @@ SELECT LOGIN.Date, COUNT(DISTINCT LOGIN.user_id) AS NRU
 FROM LOGIN 
 WHERE LOGIN.Date = LOGIN.First_login_date
 GROUP BY LOGIN.Date;
+
+-- 2. Thời gian truy cập app (KHÔNG TÍNH ĐƯỢC DO THIẾU EVENT_LOGOUT)
+-- 3. Số lần truy cập của 1 user trong ngày:
+-- 3.1: Bảng đánh số thứ tự mỗi lần login của user mỗi ngày
+WITH user_access AS (
+SELECT user_id, Date, event_time,
+  ROW_NUMBER() OVER (PARTITION BY Date, user_id ORDER BY Date) AS access_rank
+FROM `gamotasdk5.bidata.appsflyer_login_postback`
+WHERE game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+ORDER BY user_id, Date)
+
+-- 3.2: Lấy ra số lần đăng nhập:
+SELECT MAX(Access_rank), user_id, date
+FROM user_access
+GROUP BY user_id, date
