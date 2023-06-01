@@ -253,7 +253,7 @@ WHERE appinfo.game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27
 WHERE A.Date > A.First_login_date
 GROUP BY A.Date;
 
--- CÁCH 3: 
+-- CÁCH 3: (Tối ưu nhất)
 WITH FIRST_LOGIN AS (
 SELECT userinfo.user_id, MIN(Date) AS first_login_date
 FROM `gamotasdk5.bidata.login_logs`
