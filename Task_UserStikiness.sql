@@ -49,4 +49,4 @@ ORDER BY user_id, Date)
 SELECT user_id, date, MAX(Access_rank) AS NoAccess_per_day_by_user, 
 FROM user_access
 GROUP BY user_id, date
-ORDER BY user_id, date
+ORDER BY user_id, date;
