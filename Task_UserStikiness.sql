@@ -46,6 +46,7 @@ WHERE game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
 ORDER BY user_id, Date)
 
 -- 3.2: Lấy ra số lần đăng nhập:
-SELECT MAX(Access_rank), user_id, date
+SELECT user_id, date, MAX(Access_rank) AS NoAccess_per_day_by_user, 
 FROM user_access
 GROUP BY user_id, date
+ORDER BY user_id, date
