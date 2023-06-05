@@ -38,6 +38,7 @@ GROUP BY LOGIN.Date;
 -- 2. Thời gian truy cập app (KHÔNG TÍNH ĐƯỢC DO THIẾU EVENT_LOGOUT)
 -- 3. Số lần truy cập của 1 user trong ngày:
 -- 3.1: Bảng đánh số thứ tự mỗi lần login của user mỗi ngày
+WITH A AS (
 WITH user_access AS (
 SELECT user_id, Date, event_time,
   ROW_NUMBER() OVER (PARTITION BY Date, user_id ORDER BY Date) AS access_rank
@@ -49,4 +50,13 @@ ORDER BY user_id, Date)
 SELECT user_id, date, MAX(Access_rank) AS NoAccess_per_day_by_user, 
 FROM user_access
 GROUP BY user_id, date
-ORDER BY user_id, date;
+ORDER BY user_id, date
+)
+SELECT COUNT(USER_ID), 
+CASE WHEN NoAccess_per_day_by_user < 3 THEN "<3"
+  WHEN NoAccess_per_day_by_user < 10 THEN "4-10"
+  WHEN NoAccess_per_day_by_user < 50 THEN "11-50"
+  ELSE ">50"
+END AS PHANTO
+FROM A
+GROUP BY PHANTO
