@@ -60,3 +60,23 @@ CASE WHEN NoAccess_per_day_by_user <= 3 THEN "0->3"
 END AS PHANTO
 FROM A
 GROUP BY PHANTO
+
+-- Lấy ra thông tin những user đăng nhập > 30 lần/ ngày
+WITH user_access AS (
+  SELECT user_id, Date, event_time,
+    ROW_NUMBER() OVER (PARTITION BY Date, user_id ORDER BY Date) AS access_rank
+  FROM `gamotasdk5.bidata.appsflyer_login_postback`
+  WHERE game_id = 180941 AND (Date <= "2023-05-26" AND Date >= "2023-04-27")
+  ORDER BY user_id, Date
+),
+A AS (
+  SELECT UA.user_id, UA.date, MAX(UA.access_rank) AS NoAccess_per_day_by_user,
+    AF.platform, AF.country_code, AF.media_source
+  FROM user_access AS UA
+  left JOIN `gamotasdk5.bidata.appsflyer_login_postback` AS AF
+    ON UA.user_id = AF.user_id
+  GROUP BY UA.user_id, UA.date, AF.platform, AF.country_code, AF.media_source
+    HAVING MAX(UA.access_rank) > 30
+)
+SELECT *
+FROM A;
