@@ -62,6 +62,8 @@ FROM A
 GROUP BY PHANTO
 
 -- Lấy ra thông tin những user đăng nhập > 30 lần/ ngày
+
+-- Lấy ra thông tin những user đăng nhập > 30 lần/ ngày
 WITH user_access AS (
   SELECT user_id, Date, event_time,
     ROW_NUMBER() OVER (PARTITION BY Date, user_id ORDER BY Date) AS access_rank
@@ -71,12 +73,14 @@ WITH user_access AS (
 ),
 A AS (
   SELECT UA.user_id, UA.date, MAX(UA.access_rank) AS NoAccess_per_day_by_user,
-    AF.platform, AF.country_code, AF.media_source
+    AF.platform, AF.country_code, AF.media_source, GR.device_id
   FROM user_access AS UA
   left JOIN `gamotasdk5.bidata.appsflyer_login_postback` AS AF
     ON UA.user_id = AF.user_id
-  GROUP BY UA.user_id, UA.date, AF.platform, AF.country_code, AF.media_source
-    HAVING MAX(UA.access_rank) > 30
+      left JOIN `gamotasdk5.bidata.game_roles` AS GR
+    ON UA.user_id = GR.user_id
+  GROUP BY UA.user_id, UA.date, AF.platform, AF.country_code, AF.media_source, GR.device_id
+    HAVING MAX(UA.access_rank) > 50
 )
 SELECT *
 FROM A;
