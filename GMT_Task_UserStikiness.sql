@@ -52,10 +52,10 @@ FROM user_access
 GROUP BY user_id, date
 ORDER BY user_id, date
 )
-SELECT COUNT(USER_ID), 
-CASE WHEN NoAccess_per_day_by_user <= 3 THEN "<=3"
-  WHEN NoAccess_per_day_by_user <= 10 THEN "4-10"
-  WHEN NoAccess_per_day_by_user <= 30 THEN "11-<30"
+SELECT COUNT(USER_ID) AS no_user, 
+CASE WHEN NoAccess_per_day_by_user <= 3 THEN "0->3"
+  WHEN NoAccess_per_day_by_user <= 10 THEN "4->10"
+  WHEN NoAccess_per_day_by_user <= 30 THEN "11->30"
   ELSE ">30"
 END AS PHANTO
 FROM A
