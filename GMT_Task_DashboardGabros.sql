@@ -44,3 +44,27 @@ FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key, 
 WHERE event_name = 'first_open'
   AND event_date >= date_range.min_event_date
   AND event_date <= date_range.max_event_date;
+  
+ -----------------------------------------------------------------------------------------------------------------------------------------------------
+ -- Tối check lại thấy chưa ra số giống firebase:
+SELECT event_date_parsed, COUNT(DISTINCT user_pseudo_id) AS no_user_first_open
+FROM (
+  SELECT PARSE_DATE('%Y%m%d', event_date) AS event_date_parsed, user_pseudo_id
+  FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'first_open'AND key = 'previous_first_open_count' AND value.int_value = 0
+UNION ALL
+  SELECT PARSE_DATE('%Y%m%d', event_date) AS event_date_parsed, user_pseudo_id
+  FROM `gab002.analytics_378566684.events_intraday_*`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'first_open'AND key = 'previous_first_open_count' AND value.int_value = 0
+  -- "The number of times first_open was logged before this occurrence" trong tiếng Anh có nghĩa là "Số lần sự kiện 'first_open' được đăng nhập trước lần xuất hiện này". Nếu bằng 0 tức là chưa từng ghi nhận sự kiện first_open trước đây
+) 
+WHERE event_date_parsed >= "2023-05-29" AND event_date_parsed <= "2023-06-06"
+GROUP BY event_date_parsed;
+--
+  SELECT *
+  FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'first_open'
+--
+  SELECT *
+  FROM `gab002.analytics_378566684.events_intraday_*`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'first_open'
