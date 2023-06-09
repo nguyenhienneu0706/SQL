@@ -12,3 +12,14 @@ BI A Đức ✈, [6/7/2023 2:20 PM]
 SELECT * 
 FROM `gab002.analytics_378566684.events_20230606`
 LIMIT 3
+
+-- 1. Lấy số lượt first_open THEO NGÀY:
+SELECT event_date, COUNT(DISTINCT user_pseudo_id)
+FROM `gab002.analytics_378566684.events_*`,
+  UNNEST(event_params) AS params_key
+WHERE event_name = 'first_open'
+GROUP BY event_date
+LIMIT 5;
+
+-- 1.1. Lấy số lượt first_open THEO MỘT KHOẢNG THỜI GIAN:
+
