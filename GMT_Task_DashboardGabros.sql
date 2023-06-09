@@ -25,6 +25,7 @@ FROM (
   FROM `gab002.analytics_378566684.events_intraday_*`, UNNEST(event_params) AS params_key
   WHERE event_name = 'first_open'
 ) 
+WHERE event_date_parsed >= "2023-05-29" AND event_date_parsed <= "2023-06-06" -- ĐOẠN NÀY K THÊM NGÀY VẪN ĐƯỢC
 GROUP BY event_date_parsed;
 
 -- 1.1. ĐẾM TỔNG số lượt first_open TRONG MỘT KHOẢNG THỜI GIAN:
