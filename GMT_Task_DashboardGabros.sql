@@ -13,25 +13,33 @@ SELECT *
 FROM `gab002.analytics_378566684.events_20230606`
 LIMIT 3
 
--- 1. Lấy số lượt first_open THEO NGÀY:
+-- 1. Lấy số lượt first_open TRONG MỘT KHOẢNG THỜI GIAN = TỔNG số lượt first_open THEO NGÀY, do một user chỉ ghi nhận 1 lần first_open cho đến khi họ xóa app và tải lại => xem theo ngày rồi cộng lại là được (trên looker dùng Sum)
+-- Đầu tiên phải nối hai bảng lại với nhau bằng UNION ALL:
 SELECT event_date, COUNT(DISTINCT user_pseudo_id) AS no_user_first_open
-FROM `gab002.analytics_378566684.events_*`,
-  UNNEST(event_params) AS params_key
-WHERE event_name = 'first_open'
-GROUP BY event_date
-LIMIT 5;
+FROM (
+  SELECT event_date, user_pseudo_id
+  FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'first_open'
+  UNION ALL
+  SELECT event_date, user_pseudo_id
+  FROM `gab002.analytics_378566684.events_intraday_20230609`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'first_open'
+) 
+GROUP BY event_date;
 
--- 1.1. Lấy số lượt first_open TRONG MỘT KHOẢNG THỜI GIAN:
+-- 1.1. ĐẾM TỔNG số lượt first_open TRONG MỘT KHOẢNG THỜI GIAN:
 WITH date_range AS (
   SELECT 
     MIN(event_date) AS min_event_date,
     MAX(event_date) AS max_event_date
-  FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
-  WHERE event_name = 'first_open'
+  FROM (
+    SELECT event_date FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key WHERE event_name = 'first_open'
+    UNION ALL
+    SELECT event_date FROM `gab002.analytics_378566684.events_intraday_20230609`, UNNEST(event_params) AS params_key WHERE event_name = 'first_open'
+  )
 )
 SELECT COUNT(DISTINCT user_pseudo_id) AS no_user_first_open
 FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key, date_range
 WHERE event_name = 'first_open'
   AND event_date >= date_range.min_event_date
   AND event_date <= date_range.max_event_date;
-
