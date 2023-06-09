@@ -22,7 +22,7 @@ FROM (
   WHERE event_name = 'first_open'
   UNION ALL
   SELECT event_date, user_pseudo_id
-  FROM `gab002.analytics_378566684.events_intraday_20230609`, UNNEST(event_params) AS params_key
+  FROM `gab002.analytics_378566684.events_intraday_*`, UNNEST(event_params) AS params_key
   WHERE event_name = 'first_open'
 ) 
 GROUP BY event_date;
@@ -35,7 +35,7 @@ WITH date_range AS (
   FROM (
     SELECT event_date FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key WHERE event_name = 'first_open'
     UNION ALL
-    SELECT event_date FROM `gab002.analytics_378566684.events_intraday_20230609`, UNNEST(event_params) AS params_key WHERE event_name = 'first_open'
+    SELECT event_date FROM `gab002.analytics_378566684.events_intraday_*`, UNNEST(event_params) AS params_key WHERE event_name = 'first_open'
   )
 )
 SELECT COUNT(DISTINCT user_pseudo_id) AS no_user_first_open
