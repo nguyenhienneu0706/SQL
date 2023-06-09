@@ -15,17 +15,17 @@ LIMIT 3
 
 -- 1. Lấy số lượt first_open TRONG MỘT KHOẢNG THỜI GIAN = TỔNG số lượt first_open THEO NGÀY, do một user chỉ ghi nhận 1 lần first_open cho đến khi họ xóa app và tải lại => xem theo ngày rồi cộng lại là được (trên looker dùng Sum)
 -- Đầu tiên phải nối hai bảng lại với nhau bằng UNION ALL:
-SELECT event_date, COUNT(DISTINCT user_pseudo_id) AS no_user_first_open
+SELECT event_date_parsed, COUNT(DISTINCT user_pseudo_id) AS no_user_first_open
 FROM (
-  SELECT event_date, user_pseudo_id
+  SELECT PARSE_DATE('%Y%m%d', event_date) AS event_date_parsed, user_pseudo_id
   FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
   WHERE event_name = 'first_open'
   UNION ALL
-  SELECT event_date, user_pseudo_id
+  SELECT PARSE_DATE('%Y%m%d', event_date) AS event_date_parsed, user_pseudo_id
   FROM `gab002.analytics_378566684.events_intraday_*`, UNNEST(event_params) AS params_key
   WHERE event_name = 'first_open'
 ) 
-GROUP BY event_date;
+GROUP BY event_date_parsed;
 
 -- 1.1. ĐẾM TỔNG số lượt first_open TRONG MỘT KHOẢNG THỜI GIAN:
 WITH date_range AS (
