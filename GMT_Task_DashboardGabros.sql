@@ -93,7 +93,7 @@ GROUP BY event_date_parsed;
   
   --------------------------------------------------------------------------------------------------------------------------------------------------------
   -- 2. BẢNG LEVEL TRACKING:
-
+-- NGHĨ PHỨC TẠP (CÁCH NÀY BỎ BẢNG B ĐI)
 WITH A AS (
   SELECT event_date, user_pseudo_id, CAST(params_key.value.string_value AS INT64) AS Level
   FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
@@ -117,5 +117,38 @@ FROM A
 FULL JOIN B ON A.event_date = B.event_date AND A.Level = CAST(B.string_value AS INT64)
 GROUP BY event_date, Level
 ORDER BY event_date, Level;
+
+-- 2. BẢNG LEVEL TRACKING:
+-- 2.1: CHIA THEO DATE:
+WITH A AS (
+  SELECT event_date, user_pseudo_id, CAST(params_key.value.string_value AS INT64) AS Level
+  FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'a_level_start' AND params_key.key = 'level_event'
+UNION ALL
+  SELECT event_date, user_pseudo_id, CAST(params_key.value.string_value AS INT64) AS Level
+  FROM `gab002.analytics_378566684.events_intraday_*`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'a_level_start' AND params_key.key = 'level_event'
+)
+SELECT event_date, Level, COUNT(DISTINCT user_pseudo_id) AS User, COUNT(user_pseudo_id) AS Count
+FROM A
+WHERE A.event_date >= "20230529" AND A.event_date <= "20230606" -- ĐOẠN NÀY K THÊM NGÀY VẪN ĐƯỢC
+GROUP BY event_date, Level
+ORDER BY event_date, Level;
+
+-- 2.2: KHÔNG CHIA THEO DATE:
+WITH A AS (
+  SELECT event_date, user_pseudo_id, CAST(params_key.value.string_value AS INT64) AS Level
+  FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'a_level_start' AND params_key.key = 'level_event'
+UNION ALL
+  SELECT event_date, user_pseudo_id, CAST(params_key.value.string_value AS INT64) AS Level
+  FROM `gab002.analytics_378566684.events_intraday_*`, UNNEST(event_params) AS params_key
+  WHERE event_name = 'a_level_start' AND params_key.key = 'level_event'
+)
+SELECT Level,COUNT(DISTINCT user_pseudo_id) AS User, COUNT(user_pseudo_id) AS Count
+FROM A
+WHERE event_date >= "20230529" AND event_date <= "20230606" -- ĐOẠN NÀY K THÊM NGÀY VẪN ĐƯỢC
+GROUP BY Level
+ORDER BY Level;
 
 
