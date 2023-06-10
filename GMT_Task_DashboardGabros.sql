@@ -60,7 +60,14 @@ WHERE event_name = 'first_open'
   AND event_date >= date_range.min_event_date
   AND event_date <= date_range.max_event_date;
   
- -----------------------------------------------------------------------------------------------------------------------------------------------------
+-- NẾU BỎ QUA BẢNG INTRADAY KHÔNG LẤY HAI NGÀY GẦN NHẤT:
+SELECT event_date, COUNT(DISTINCT user_pseudo_id) AS no_user_first_open
+FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+WHERE event_name = 'first_open'
+AND event_date >= "20230529" AND event_date <= "20230606" -- ĐOẠN NÀY K THÊM NGÀY VẪN ĐƯỢC
+GROUP BY event_date;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
  -- Tối check lại thấy chưa ra số giống firebase:
 SELECT event_date_parsed, COUNT(DISTINCT user_pseudo_id) AS no_user_first_open
 FROM (
