@@ -106,7 +106,7 @@ SELECT
   SUM(A.Amount_local) AS Total_Amount_local
 FROM A
 GROUP BY A.DATE;
-
+-- GIAI ĐOẠN: OB - OB+30:
 -- Lấy ra danh sách nạp (transactions) không bị dup dữ liệu OB-OB+30
 SELECT
   DISTINCT (transaction.id) AS Transaction_ID,
