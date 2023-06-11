@@ -64,6 +64,17 @@ ORDER BY Total_amount DESC;
 -- TASK TRUNG ORDER NOTION: Tìm mốc nạp trung vị (nếu có kĩ từng percentile thì càng tốt) của NEW USER Alo Chủ Tướng trong giai đoạn OB-OB+30 và 02/06-09/06:
 
 -- Lấy ra danh sách nạp (transactions) không bị dup dữ liệu OB-OB+30
+SELECT
+  DISTINCT (transaction.id) AS Transaction_ID,
+  user.user_id AS User_ID,
+  date AS Date_pay,
+  transaction.amount_local AS Amount_local
+FROM `gamotasdk5.bidata.transactions`
+WHERE app.game_id = 180941 AND (Date <= "2023-05-27" AND Date >= "2023-04-27")
+AND transaction.vendor != "gamota_tester"
+ORDER BY Amount_local;
+
+-- Lấy ra Trung vị:
 WITH TRANS_ALO AS
 (
   SELECT
