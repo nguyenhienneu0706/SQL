@@ -59,6 +59,35 @@ FROM TRANS
 GROUP BY AF_LOGIN.media_source
 ORDER BY Total_amount DESC; 
 
+/* Cụ thể điều kiện: 
+Thời gian : từ ngày 27/04 đến ngày 27/05
+Tổng nạp tích lũy ( total amount local) [20tr, 50tr)
+	Yêu cầu
+Lấy theo chiều ngày để xem mỗi ngày user đó nạp bao nhiêu, nhiều hay ít và ngày nào không nạp */
+
+-- Lấy ra bảng không bị dup giao dịch --
+WITH trans_dedup AS(
+  SELECT DISTINCT transaction.id as trans_id, date, transaction.amount_local AS amt_local, user.user_id AS user_id
+  FROM
+  gamotasdk5.bidata.transactions
+  WHERE
+    date >= "2023-04-27"
+    AND date <= "2023-05-27"
+    AND app.game_id = 180941
+    AND transaction.vendor != "gamota_tester"
+),
+-- Lấy các user_id có tổng nạp tích lũy từ 20-50tr --
+user_sum AS(
+  SELECT trans_dedup.user_id AS user_id, SUM(trans_dedup.amt_local) as total_amt
+  FROM trans_dedup
+  GROUP BY user_id
+  HAVING SUM(trans_dedup.amt_local) >= 20000000 AND SUM(trans_dedup.amt_local) <= 50000000
+)
+-- Lấy thông tin các cột cần, với điều kiện user_id thuộc bảng user tổng nạp tích lũy 20-50 --
+SELECT trans_dedup.trans_id, date, trans_dedup.amt_local, trans_dedup.user_id
+FROM trans_dedup
+WHERE trans_dedup.user_id IN(SELECT user_sum.user_id FROM user_sum)
+
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- TASK TRUNG ORDER NOTION: Tìm mốc nạp trung vị (nếu có kĩ từng percentile thì càng tốt) của NEW USER Alo Chủ Tướng trong giai đoạn OB-OB+30 và 02/06-09/06:
