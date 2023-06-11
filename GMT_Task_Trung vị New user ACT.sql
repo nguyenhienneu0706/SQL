@@ -88,7 +88,11 @@ AND transaction.vendor != "gamota_tester"
 ORDER BY Amount_local
 )
 SELECT
+  APPROX_QUANTILES(Amount_local, 100)[OFFSET(9)] AS percentile_10,
   APPROX_QUANTILES(Amount_local, 100)[OFFSET(24)] AS percentile_25,
+  APPROX_QUANTILES(Amount_local, 100)[OFFSET(39)] AS percentile_40,
   APPROX_QUANTILES(Amount_local, 100)[OFFSET(49)] AS percentile_50,
-  APPROX_QUANTILES(Amount_local, 100)[OFFSET(74)] AS percentile_75
+  APPROX_QUANTILES(Amount_local, 100)[OFFSET(59)] AS percentile_60,
+  APPROX_QUANTILES(Amount_local, 100)[OFFSET(74)] AS percentile_75,
+  APPROX_QUANTILES(Amount_local, 100)[OFFSET(89)] AS percentile_90,
 FROM TRANS_ALO;
