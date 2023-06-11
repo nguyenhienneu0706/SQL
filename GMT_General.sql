@@ -303,7 +303,30 @@ AND transaction.vendor != "gamota_tester"
 SELECT 
   COUNT (DISTINCT user_id) AS PU
   FROM T_DISTINCT;
-
+--
+-- Lấy ra các thông tin về giao dịch đầu tiên của user ACT tháng đầu ra mắt:
+WITH TRANS AS (
+SELECT DISTINCT transaction.id AS trans_id, transaction.amount_local AS amount_local, user.user_id AS user_id, created
+FROM `gamotasdk5.bidata.transactions`
+WHERE date >= "2023-04-27" AND date <= "2023-05-31"
+AND app.game_id = 180941
+AND transaction.vendor != "gamota_tester"
+),
+REGISTER AS (
+SELECT DISTINCT user_id, date
+FROM `gamotasdk5.bidata.register_logs`
+WHERE date >= "2023-04-27" AND date <= "2023-05-31"
+AND game_id = 180941
+)
+SELECT TRANS.user_id, register.date AS register_date, TRANS.amount_local, TRANS.created AS date_pay, TRANS.trans_id
+FROM TRANS
+LEFT JOIN REGISTER ON TRANS.user_id = REGISTER.user_id
+LEFT JOIN (
+SELECT user_id, MIN(created) AS min_created
+FROM TRANS
+GROUP BY user_id
+) AS T2 ON TRANS.user_id = T2.user_id AND TRANS.created = T2.min_created
+WHERE T2.user_id IS NOT NULL;
 
 
 
