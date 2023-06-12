@@ -151,4 +151,17 @@ WHERE event_date >= "20230529" AND event_date <= "20230606" -- ĐOẠN NÀY K TH
 GROUP BY Level
 ORDER BY Level;
 
+--------------------------------------------------------------------------------------------------------------------------------------------
+-- CHỐT KHÔNG DÙNG BẢNG INTRADAY NỮA:
+
+-- 1. Lấy số lượt first_open TRONG MỘT KHOẢNG THỜI GIAN = tổng các ngày:
+
+SELECT event_date, 
+  COUNT(DISTINCT user_pseudo_id) AS No_user_first_open
+FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+WHERE event_name = 'first_open' 
+  AND params_key.key = "ga_session_id"
+GROUP BY event_date;
+-- Check với số từng ngày trên firebase đúng rồi ạ huhu
+
 
