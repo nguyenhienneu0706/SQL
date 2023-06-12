@@ -165,7 +165,8 @@ GROUP BY event_date;
 -- Check với số từng ngày trên firebase đúng rồi ạ huhu
 
 -- 2. BẢNG LEVEL TRACKING:
--- 2.1: CHIA THEO DATE:
+-- Level Start:
+-- 2.1.1: CHIA THEO DATE:
 SELECT event_date, 
   CAST(params_key.value.string_value AS INT64) AS Level,
   COUNT(DISTINCT user_pseudo_id) AS User, 
@@ -174,7 +175,7 @@ FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
 WHERE event_name = 'a_level_start' AND params_key.key = 'level_event'
 GROUP BY event_date, Level
 ORDER BY event_date, Level;
--- 2.2: KHÔNG CHIA THEO DATE:
+-- 2.1.2: KHÔNG CHIA THEO DATE:
 SELECT
   CAST(params_key.value.string_value AS INT64) AS Level,
   COUNT(DISTINCT user_pseudo_id) AS User, 
@@ -184,6 +185,43 @@ WHERE event_name = 'a_level_start' AND params_key.key = 'level_event'
 -- AND params_key.value.string_value IS NOT NULL: CÓ THÊM HAY KHÔNG CŨNG KHÔNG QUAN TRỌNG DO VỚI CÁC ĐK TRƯỚC THÌ GIÁ TRỊ NÀY KBH NULL
 GROUP BY Level
 ORDER BY Level;
---> Kết quả chênh hơn 8-9% so với firebase nhưng nhìn chung khá hợp lý. Chấp nhận
 
+-- Level Complete:
+-- 2.2.1: CHIA THEO DATE:
+SELECT event_date, 
+  CAST(params_key.value.string_value AS INT64) AS Level,
+  COUNT(DISTINCT user_pseudo_id) AS User, 
+  COUNT(user_pseudo_id) AS Count
+FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+WHERE event_name = 'a_level_complete' AND params_key.key = 'level_event'
+GROUP BY event_date, Level
+ORDER BY event_date, Level;
+-- 2.2.2: KHÔNG CHIA THEO DATE:
+SELECT
+  CAST(params_key.value.string_value AS INT64) AS Level,
+  COUNT(DISTINCT user_pseudo_id) AS User, 
+  COUNTIF(event_name = 'a_level_complete' AND params_key.key = 'level_event') AS Count
+FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+WHERE event_name = 'a_level_complete' AND params_key.key = 'level_event'
+GROUP BY Level
+ORDER BY Level;
 
+-- Level Fail:
+-- 2.2.1: CHIA THEO DATE:
+SELECT event_date, 
+  CAST(params_key.value.string_value AS INT64) AS Level,
+  COUNT(DISTINCT user_pseudo_id) AS User, 
+  COUNT(user_pseudo_id) AS Count
+FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+WHERE event_name = 'a_level_fail' AND params_key.key = 'level_event'
+GROUP BY event_date, Level
+ORDER BY event_date, Level;
+-- 2.2.2: KHÔNG CHIA THEO DATE:
+SELECT
+  CAST(params_key.value.string_value AS INT64) AS Level,
+  COUNT(DISTINCT user_pseudo_id) AS User, 
+  COUNTIF(event_name = 'a_level_fail' AND params_key.key = 'level_event') AS Count
+FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+WHERE event_name = 'a_level_fail' AND params_key.key = 'level_event'
+GROUP BY Level
+ORDER BY Level;
