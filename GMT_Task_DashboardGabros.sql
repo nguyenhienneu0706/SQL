@@ -227,3 +227,25 @@ FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
 WHERE event_name = 'a_level_fail' AND params_key.key = 'level_event'
 GROUP BY Level
 ORDER BY Level;
+
+-- Fail gộp bảng:
+WITH Level_counts AS (
+SELECT event_date, 
+  CAST(params_key.value.string_value AS INT64) AS Level,
+  COUNT(DISTINCT user_pseudo_id) AS User, 
+  COUNTIF(event_name = 'a_level_fail' AND params_key.key = 'level_event') AS Count
+FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
+WHERE event_name = 'a_level_fail' AND params_key.key = 'level_event'
+GROUP BY event_date, Level
+ORDER BY event_date, Level
+)
+SELECT 
+CASE
+  WHEN CAST(params_key.value.string_value AS INT64) < 10 THEN CAST(params_key.value.string_value AS INT64)
+    ELSE MOD(CAST(params_key.value.string_value AS INT64),10)
+  END AS LevelGroup,
+SUM(User) AS Total_Users
+SUM(Count) AS Total_Count
+FROM Level_counts
+GROUP BY LevelGroup
+ORDER BY LevelGroup;
