@@ -170,7 +170,7 @@ GROUP BY event_date;
 SELECT event_date, 
   CAST(params_key.value.string_value AS INT64) AS Level,
   COUNT(DISTINCT user_pseudo_id) AS User, 
-  COUNT(user_pseudo_id) AS Count
+  COUNTIF(event_name = 'a_level_start' AND params_key.key = 'level_event') AS Count
 FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
 WHERE event_name = 'a_level_start' AND params_key.key = 'level_event'
 GROUP BY event_date, Level
@@ -191,7 +191,7 @@ ORDER BY Level;
 SELECT event_date, 
   CAST(params_key.value.string_value AS INT64) AS Level,
   COUNT(DISTINCT user_pseudo_id) AS User, 
-  COUNT(user_pseudo_id) AS Count
+  COUNTIF(event_name = 'a_level_complete' AND params_key.key = 'level_event') AS Count
 FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
 WHERE event_name = 'a_level_complete' AND params_key.key = 'level_event'
 GROUP BY event_date, Level
@@ -211,7 +211,8 @@ ORDER BY Level;
 SELECT event_date, 
   CAST(params_key.value.string_value AS INT64) AS Level,
   COUNT(DISTINCT user_pseudo_id) AS User, 
-  COUNT(user_pseudo_id) AS Count
+  COUNTIF(event_name = 'a_level_fail' AND params_key.key = 'level_event') AS Count,
+  (COUNTIF(event_name = 'a_level_fail' AND params_key.key = 'level_event'))/ COUNT(DISTINCT user_pseudo_id) AS TimeReplay
 FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
 WHERE event_name = 'a_level_fail' AND params_key.key = 'level_event'
 GROUP BY event_date, Level
@@ -220,7 +221,8 @@ ORDER BY event_date, Level;
 SELECT
   CAST(params_key.value.string_value AS INT64) AS Level,
   COUNT(DISTINCT user_pseudo_id) AS User, 
-  COUNTIF(event_name = 'a_level_fail' AND params_key.key = 'level_event') AS Count
+  COUNTIF(event_name = 'a_level_fail' AND params_key.key = 'level_event') AS Count,
+  (COUNTIF(event_name = 'a_level_fail' AND params_key.key = 'level_event'))/ COUNT(DISTINCT user_pseudo_id) AS TimeReplay
 FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS params_key
 WHERE event_name = 'a_level_fail' AND params_key.key = 'level_event'
 GROUP BY Level
