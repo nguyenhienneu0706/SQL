@@ -152,6 +152,7 @@ GROUP BY Level
 ORDER BY Level;
 
 --------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 -- CHỐT KHÔNG DÙNG BẢNG INTRADAY NỮA:
 
 -- 1. Lấy số lượt first_open TRONG MỘT KHOẢNG THỜI GIAN = tổng các ngày:
@@ -241,10 +242,11 @@ ORDER BY event_date, Level
 )
 SELECT 
 CASE
-  WHEN CAST(params_key.value.string_value AS INT64) < 10 THEN CAST(params_key.value.string_value AS INT64)
-    ELSE MOD(CAST(params_key.value.string_value AS INT64),10)
+  WHEN Level <= 10 THEN Level
+  WHEN MOD(Level, 10) = 0 THEN 10
+    ELSE MOD(Level, 10)
   END AS LevelGroup,
-SUM(User) AS Total_Users
+SUM(User) AS Total_Users,
 SUM(Count) AS Total_Count
 FROM Level_counts
 GROUP BY LevelGroup
