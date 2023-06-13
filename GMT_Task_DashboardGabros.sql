@@ -251,3 +251,32 @@ SUM(Count) AS Total_Count
 FROM Level_counts
 GROUP BY LevelGroup
 ORDER BY LevelGroup;
+
+-- LẤY RA CÁC THÔNG TIN THEO KHU VỰC:
+SELECT
+  geo.country,
+  event_date,
+  COUNT(DISTINCT(user_pseudo_id)) AS users,
+  COUNTIF(event_name = "first_open" AND param.key = "ga_session_id") AS first_open,
+  COUNTIF(param.key = "session_engaged") AS engaged_session,
+  COUNTIF(param.key = "ga_session_id" AND event_name = "session_start") AS session,
+  COUNTIF(param.key = "ga_session_id" AND event_name IS NOT NULL) AS all_event_count,
+  COUNTIF(param.key = "firebase_conversion" AND event_name IS NOT NULL) AS all_event_conversion,
+  SUM(CASE WHEN param.key = "engagement_time_msec" THEN param.value.int_value END)/60000 AS avg_engagement_time,
+FROM
+  `gab002.analytics_378566684.events_*`,UNNEST(event_params) AS param
+GROUP BY geo.country,
+         event_date -- Thêm trường event_date vào phần GROUP BY
+ORDER BY users DESC;
+
+-- Lấy Average engagement time per session
+WITH A AS
+(
+  SELECT event_date, 
+  COUNTIF(param.key = "ga_session_id" AND event_name = "session_start") AS session,
+  SUM(CASE WHEN  param.key = "engagement_time_msec" THEN param.value.int_value END)/1000 AS sum_engagement_time
+FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS param
+GROUP BY event_date
+)
+SELECT SUM(A.sum_engagement_time)/SUM(A.session) AS avg_engagement_time_per_session
+FROM A
