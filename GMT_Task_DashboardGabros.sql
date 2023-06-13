@@ -269,14 +269,17 @@ GROUP BY geo.country,
          event_date -- Thêm trường event_date vào phần GROUP BY
 ORDER BY users DESC;
 
--- Lấy Average engagement time per session
+-- Lấy Average engagement time per session và Average engagement time per engaged session:
 WITH A AS
 (
   SELECT event_date, 
+  COUNTIF(param.key = "session_engaged" AND event_name IS NOT NULL) AS engaged_session,
   COUNTIF(param.key = "ga_session_id" AND event_name = "session_start") AS session,
   SUM(CASE WHEN  param.key = "engagement_time_msec" THEN param.value.int_value END)/1000 AS sum_engagement_time
 FROM `gab002.analytics_378566684.events_*`, UNNEST(event_params) AS param
 GROUP BY event_date
 )
-SELECT SUM(A.sum_engagement_time)/SUM(A.session) AS avg_engagement_time_per_session
+SELECT 
+  SUM(A.sum_engagement_time)/SUM(A.session) AS avg_engagement_time_per_session,
+  SUM(A.sum_engagement_time)/SUM(A.engaged_session) AS avg_engagement_time_per_engaged_session
 FROM A
