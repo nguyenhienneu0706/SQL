@@ -120,9 +120,7 @@ WHERE game_id = 180941 AND DATE(Date) >= "2023-04-27" AND server_id != "001"
 )
 SELECT LOGIN.Date_login, SERVER.Date_server, SERVER.server_id, LOGIN.user_id AS User_ID
 FROM LOGIN 
-LEFT JOIN SERVER ON LOGIN.user_id = SERVER.user_id AND LOGIN.Date_login = SERVER.Date_server
-GROUP BY LOGIN.Date_login, SERVER.server_id, SERVER.Date_server
-ORDER BY LOGIN.Date_login;
+LEFT JOIN SERVER ON LOGIN.user_id = SERVER.user_id AND LOGIN.Date_login = SERVER.Date_server;
 --- Ngoài ra dữ liệu từ bảng roles chỉ ghi nhận được như này (thiếu đi những người login nhưng k tracking được server_id)
 WITH A AS (
 SELECT DATE(Date) AS Date_server, server_id, user_id
