@@ -120,7 +120,9 @@ WHERE game_id = 180941 AND DATE(Date) >= "2023-04-27" AND server_id != "001"
 )
 SELECT LOGIN.Date_login, SERVER.Date_server, SERVER.server_id, LOGIN.user_id AS User_ID
 FROM LOGIN 
-LEFT JOIN SERVER ON LOGIN.user_id = SERVER.user_id AND LOGIN.Date_login = SERVER.Date_server;
+LEFT JOIN SERVER ON LOGIN.user_id = SERVER.user_id AND LOGIN.Date_login = SERVER.Date_server
+-- WHERE LOGIN.Date_login = "2023-04-30" ; ví dụ check ngày 30/05
+
 --- Ngoài ra dữ liệu từ bảng roles chỉ ghi nhận được như này (thiếu đi những người login nhưng k tracking được server_id)
 WITH A AS (
 SELECT DATE(Date) AS Date_server, server_id, user_id
@@ -131,3 +133,12 @@ SELECT Date_server, server_id, COUNT(DISTINCT user_id) AS DAU
 FROM A 
 GROUP BY Date_server, server_id
 ORDER BY Date_server;
+--- Thực sự, các users này có login nhưng k có thông tin về server:
+SELECT *
+FROM `gamotasdk5.bidata.game_roles`
+WHERE game_id = 180941 AND DATE(Date) >= "2023-04-27" AND server_id IN ("15812993",
+"65923379",
+"58960807",
+"66202958",
+"66213370")
+---> There is no data to display.
