@@ -84,3 +84,40 @@ A AS (
 )
 SELECT *
 FROM A;
+---------------------------------------------------------------------------------------------------------------------------------------------------
+-- Tìm lượng DAU Alo Chủ Tướng theo server:
+WITH LOGIN AS (
+SELECT DISTINCT(appsflyer_id), -- CŨNG BỊ TRÙNG (635084 - BAN ĐẦU: 2075045)
+  Date AS Date_login, user_id
+FROM `gamotasdk5.bidata.appsflyer_login_postback`
+WHERE game_id = 180941 AND (Date >= "2023-04-27")
+),
+SERVER AS (
+SELECT DATE(Date) AS Date_server, server_id, user_id
+FROM `gamotasdk5.bidata.game_roles`
+WHERE game_id = 180941 AND DATE(Date) >= "2023-04-27" AND server_id != "001"
+)
+SELECT LOGIN.Date_login, SERVER.Date_server, SERVER.server_id, COUNT(DISTINCT LOGIN.user_id) AS DAU
+FROM LOGIN 
+LEFT JOIN SERVER ON LOGIN.user_id = SERVER.user_id AND LOGIN.Date_login = SERVER.Date_server
+GROUP BY LOGIN.Date_login, SERVER.server_id, SERVER.Date_server
+ORDER BY LOGIN.Date_login;
+--- Nhưng kết qủa trả về có rất nhiều lượt vào login mà k tracking được server_id
+
+--- Nên đi check tiếp xem có đúng k, bằng cách xem từng lượt login ghi nhận như thế nào:
+WITH LOGIN AS (
+SELECT DISTINCT(appsflyer_id), -- CŨNG BỊ TRÙNG (635084 - BAN ĐẦU: 2075045)
+  Date AS Date_login, user_id
+FROM `gamotasdk5.bidata.appsflyer_login_postback`
+WHERE game_id = 180941 AND (Date >= "2023-04-27")
+),
+SERVER AS (
+SELECT DATE(Date) AS Date_server, server_id, user_id
+FROM `gamotasdk5.bidata.game_roles`
+WHERE game_id = 180941 AND DATE(Date) >= "2023-04-27" AND server_id != "001"
+)
+SELECT LOGIN.Date_login, SERVER.Date_server, SERVER.server_id, LOGIN.user_id AS User_ID
+FROM LOGIN 
+LEFT JOIN SERVER ON LOGIN.user_id = SERVER.user_id AND LOGIN.Date_login = SERVER.Date_server
+GROUP BY LOGIN.Date_login, SERVER.server_id, SERVER.Date_server
+ORDER BY LOGIN.Date_login;
