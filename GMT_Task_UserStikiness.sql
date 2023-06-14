@@ -85,6 +85,7 @@ A AS (
 SELECT *
 FROM A;
 ---------------------------------------------------------------------------------------------------------------------------------------------------
+
 -- Tìm lượng DAU Alo Chủ Tướng theo server:
 WITH LOGIN AS (
 SELECT DISTINCT(appsflyer_id), -- CŨNG BỊ TRÙNG (635084 - BAN ĐẦU: 2075045)
@@ -96,10 +97,11 @@ SERVER AS (
 SELECT DATE(Date) AS Date_server, server_id, user_id
 FROM `gamotasdk5.bidata.game_roles`
 WHERE game_id = 180941 AND DATE(Date) >= "2023-04-27" AND server_id != "001"
+-- một user vào cùng 1 server vào những ngày khác nhau vẫn ghi nhận hết, điều đó chứng tỏ cứ vào tận trong server là nó tính chứ nó k chỉ tính mỗi cái ngày mà nó đăng kí roles
 )
 SELECT LOGIN.Date_login, SERVER.Date_server, SERVER.server_id, COUNT(DISTINCT LOGIN.user_id) AS DAU
 FROM LOGIN 
-LEFT JOIN SERVER ON LOGIN.user_id = SERVER.user_id AND LOGIN.Date_login = SERVER.Date_server
+RIGHT JOIN SERVER ON LOGIN.user_id = SERVER.user_id AND LOGIN.Date_login = SERVER.Date_server
 GROUP BY LOGIN.Date_login, SERVER.server_id, SERVER.Date_server
 ORDER BY LOGIN.Date_login;
 --- Nhưng kết qủa trả về có rất nhiều lượt vào login mà k tracking được server_id
@@ -121,3 +123,13 @@ FROM LOGIN
 LEFT JOIN SERVER ON LOGIN.user_id = SERVER.user_id AND LOGIN.Date_login = SERVER.Date_server
 GROUP BY LOGIN.Date_login, SERVER.server_id, SERVER.Date_server
 ORDER BY LOGIN.Date_login;
+--- Ngoài ra dữ liệu từ bảng roles chỉ ghi nhận được như này (thiếu đi những người login nhưng k tracking được server_id)
+WITH A AS (
+SELECT DATE(Date) AS Date_server, server_id, user_id
+FROM `gamotasdk5.bidata.game_roles`
+WHERE game_id = 180941 AND DATE(Date) >= "2023-04-27" AND server_id != "001"
+)
+SELECT Date_server, server_id, COUNT(DISTINCT user_id) AS DAU
+FROM A 
+GROUP BY Date_server, server_id
+ORDER BY Date_server;
