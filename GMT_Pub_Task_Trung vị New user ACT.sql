@@ -30,8 +30,9 @@ AND transaction.vendor != "gamota_tester"
 SELECT 
   COUNT (DISTINCT user_id) AS PU
   FROM T_DISTINCT;
+-----------------------------------------------------------------------------------------------------------------------
+-- 1. Task Query doanh thu Alo chủ tướng:
 
--- Task Query doanh thu Alo chủ tướng:
 WITH TRANS AS (
 SELECT
   DISTINCT (transaction.id),
@@ -87,10 +88,9 @@ user_sum AS(
 SELECT trans_dedup.trans_id, date, trans_dedup.amt_local, trans_dedup.user_id
 FROM trans_dedup
 WHERE trans_dedup.user_id IN(SELECT user_sum.user_id FROM user_sum)
-
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
--- TASK TRUNG ORDER NOTION: Tìm mốc nạp trung vị (nếu có kĩ từng percentile thì càng tốt) của NEW USER Alo Chủ Tướng trong giai đoạn OB-OB+30 và 02/06-09/06:
+-- 2. TASK TRUNG ORDER NOTION: Tìm mốc nạp trung vị (nếu có kĩ từng percentile thì càng tốt) của NEW USER Alo Chủ Tướng trong giai đoạn OB-OB+30 và 02/06-09/06:
 -- Check: LẤY RA DOANH THU THEO NGÀY:
 WITH A AS (
   SELECT
