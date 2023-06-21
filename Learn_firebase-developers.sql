@@ -144,5 +144,7 @@ FROM (
      FROM week_3_users 
      JOIN week_0_users USING (user_pseudo_id)) AS week_3_cohort
 );
+-- Tuy nhiên, điều gì sẽ xảy ra nếu chúng ta đột nhiên muốn thay đổi ngày bắt đầu của báo cáo?
+-->
 
 ** TRƯỜNG HỢP TỔNG QUÁT:
