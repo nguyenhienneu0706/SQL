@@ -212,33 +212,19 @@ FROM (
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- TRƯỜNG HỢP GAMOTA:
-
--- BƯỚC 02:
 WITH analytics_data AS (
   SELECT user_pseudo_id, event_timestamp, event_name, 
-    UNIX_MICROS(TIMESTAMP("2018-08-01 00:00:00", "-7:00")) AS start_day,
+    UNIX_MICROS(TIMESTAMP("2023-05-29 00:00:00", "-7:00")) AS start_day,
     3600*1000*1000*24*7 AS one_week_micros
-  FROM `firebase-public-project.analytics_153293282.events_*`
-  WHERE _table_suffix BETWEEN '20180731' AND '20180829'
+  FROM `gab002.analytics_378566684.events_*`
+  WHERE _table_suffix BETWEEN '20230529' AND '20230627'
 )
-SELECT DISTINCT user_pseudo_id
-FROM analytics_data
-WHERE event_name = 'first_open'
-  AND event_timestamp BETWEEN start_day AND start_day+(1*one_week_micros)
 
--- BƯỚC 01:
-WITH analytics_data AS (
-  SELECT user_pseudo_id, event_timestamp, event_name, 
-    UNIX_MICROS(TIMESTAMP("2018-08-01 00:00:00", "-7:00")) AS start_day,
-    3600*1000*1000*24*7 AS one_week_micros
-  FROM `firebase-public-project.analytics_153293282.events_*`
-  WHERE _table_suffix BETWEEN '20180731' AND '20180829'
-)
-  
-SELECT week_0_cohort / week_0_cohort AS week_0_pct,
- week_1_cohort / week_0_cohort AS week_1_pct,
- week_2_cohort / week_0_cohort AS week_2_pct,
- week_3_cohort / week_0_cohort AS week_3_pct
+SELECT 
+  IFNULL(week_0_cohort / NULLIF(week_0_cohort, 0), 0) AS week_0_pct,
+  IFNULL(week_1_cohort / NULLIF(week_0_cohort, 0), 0) AS week_1_pct,
+  IFNULL(week_2_cohort / NULLIF(week_0_cohort, 0), 0) AS week_2_pct,
+  IFNULL(week_3_cohort / NULLIF(week_0_cohort, 0), 0) AS week_3_pct
 FROM (
   WITH week_3_users AS (
     SELECT DISTINCT user_pseudo_id
