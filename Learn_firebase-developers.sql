@@ -211,7 +211,9 @@ FROM (
 );
 
 ----------------------------------------------------------------------------------------------------------------------------------------
+
 -- TRƯỜNG HỢP GAMOTA:
+
 WITH analytics_data AS (
   SELECT user_pseudo_id, event_timestamp, event_name, 
     UNIX_MICROS(TIMESTAMP("2023-05-29 00:00:00", "-7:00")) AS start_day,
