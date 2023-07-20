@@ -10,7 +10,7 @@ WITH R AS (
     game_id AS Game
   FROM `gamotasdk5.bidata.game_roles` 
   WHERE game_id = '180419'
-  AND server_id LIKE '230%' OR server_id LIKE '231%'
+  AND server_id LIKE '230_%' OR server_id LIKE '231_%'
 ),
 -- B2: Tạo ra bảng chứa server và ngày đầu tiên có user vào server (coi như là ngày mở server):
 S AS (
@@ -19,7 +19,7 @@ SELECT DISTINCT server_id AS Server,
   DATE_ADD(MIN(DATE(date)), INTERVAL 30 DAY) AS Onemonth
 FROM `gamotasdk5.bidata.game_roles` 
 WHERE game_id = '180419'
-  AND server_id LIKE '230%' OR server_id LIKE '231%'
+  AND server_id LIKE '230_%' OR server_id LIKE '231_%'
 GROUP BY Server
 )
 -- Join 2 bảng lấy ra số NRU trong 30 ngày kể từ ngày ra mắt:
@@ -83,7 +83,7 @@ WITH R AS (
     game_id AS Game
   FROM `gamotasdk5.bidata.game_roles` 
   WHERE game_id = '180419'
-  AND server_id LIKE '230%' OR server_id LIKE '231%'
+  AND server_id LIKE '230_%' OR server_id LIKE '231_%'
 ),
 -- B2: Tạo ra bảng chứa server và ngày đầu tiên có user vào server (coi như là ngày mở server):
 S AS (
@@ -93,7 +93,7 @@ SELECT DISTINCT server_id AS Server,
   DATE_ADD(MIN(DATE(date)), INTERVAL 60 DAY) AS Twomonth
 FROM `gamotasdk5.bidata.game_roles` 
 WHERE game_id = '180419'
-  AND server_id LIKE '230%' OR server_id LIKE '231%'
+  AND server_id LIKE '230_%' OR server_id LIKE '231_%'
 GROUP BY Server
 )
 -- Join 2 bảng lấy ra số NRU trong 30 ngày kể từ ngày ra mắt:
@@ -158,7 +158,7 @@ SELECT DISTINCT (transaction.id),
   transaction.amount_local AS amount_local
 FROM `gamotasdk5.bidata.transactions`
   WHERE app.game_id = '180419'
-  AND user.server_id LIKE '230%' OR user.server_id LIKE '231%'
+  AND user.server_id LIKE '230_%' OR user.server_id LIKE '231_%'
 ),
 -- B2: Tạo ra bảng chứa server và ngày đầu tiên có user vào server (coi như là ngày mở server):
 S AS (
@@ -167,7 +167,7 @@ SELECT DISTINCT (server_id) AS Server,
   DATE_ADD(MIN(DATE(date)), INTERVAL 30 DAY) AS Onemonth
 FROM `gamotasdk5.bidata.game_roles` 
 WHERE game_id = '180419'
-  AND server_id LIKE '230%' OR server_id LIKE '231%'
+  AND server_id LIKE '230_%' OR server_id LIKE '231_%'
 GROUP BY Server
 )
 -- Join 2 bảng lấy ra số PU/ REV trong 30 ngày kể từ ngày ra mắt:
