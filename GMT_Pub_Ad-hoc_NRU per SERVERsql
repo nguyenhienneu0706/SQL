@@ -73,7 +73,7 @@ WHERE Date <= Onemonth AND Date >= ServerOpen_Day
 GROUP BY Server
 ORDER BY Server;
 
--- LẤY RA NRU CÒN LẠI SAU 30 DAYS KỂ TỪ NGÀY ĐẦU TIÊN TRUY CẬP 
+-- LẤY RA NRU CÒN LẠI SAU 30 DAYS KỂ TỪ NGÀY ĐẦU TIÊN TRUY CẬP
 -- B1: Tạo ra bảng chứa role_id không bị trùng lặp (số NRU):
 WITH R AS (
   SELECT DISTINCT role_id AS Role,
@@ -153,6 +153,7 @@ ORDER BY Server;
 WITH T AS (
 SELECT DISTINCT (transaction.id),
   Date,
+  user_id,
   user.role_id AS Role,
   user.server_id AS Server,
   transaction.amount_local AS amount_local
@@ -171,7 +172,7 @@ WHERE game_id = '180419'
 GROUP BY Server
 )
 -- Join 2 bảng lấy ra số PU/ REV trong 30 ngày kể từ ngày ra mắt:
-SELECT COUNT(DISTINCT T.Role) AS PU,
+SELECT COUNT(DISTINCT T.User_id) AS PU,
   SUM(T.amount_local) AS Revenue30days,
   S.Server,
   S.ServerOpen_Day,
