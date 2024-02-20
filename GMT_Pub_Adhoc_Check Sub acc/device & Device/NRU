@@ -1,0 +1,71 @@
+
+-- Check một device tạo nhiều acc
+SELECT *, 
+ROW_NUMBER() OVER(PARTITION BY  RAW.device_id ORDER BY RAW.fdate) AS stt
+FROM
+(
+WITH 
+A AS 
+(
+SELECT DISTINCT (user_id), MIN(date) as fdate, MIN(date) +1 as sdate
+FROM `gamotasdk5.bidata.register_logs`
+WHERE app_id = 200421 
+AND date >= "2023-6-01" and date <= "2023-6-30"
+--AND date >= "2023-09-01" and date <= "2023-09-30"
+GROUP BY user_id
+)
+,B AS
+(
+SELECT DISTINCT device_id, user_id, DATE as login_date, app_id
+FROM `gamotasdk5.bidata.appsflyer_login_postback`
+WHERE app_id = 200421
+AND date >= "2023-6-01" and date <= "2023-6-30"
+--AND date >= "2023-09-01" and date <= "2023-09-30"
+)
+SELECT distinct A.user_id, B.device_id, A.fdate, A.sdate, B.app_id
+FROM A 
+INNER JOIN B
+ON A.user_id = B.user_id
+WHERE B.app_id = 200421
+--AND B.login_date = A.sdate --ĐÂY LÀ ĐIỀU KIỆN LÀ RR1 HAY LÀ TỬ SỐ, MẪU SỐ THÌ CMT DÒNG NÀY ĐI
+ORDER BY B.device_id DESC, A.user_id
+) 
+AS RAW
+
+---
+
+-- Check một acc sử dụng trên nhiều device
+SELECT *, 
+ROW_NUMBER() OVER(PARTITION BY  RAW.user_id ORDER BY RAW.fdate) AS stt
+FROM
+(
+WITH 
+A AS 
+(
+SELECT DISTINCT (user_id), MIN(date) as fdate, MIN(date) +1 as sdate
+FROM `gamotasdk5.bidata.register_logs`
+WHERE app_id = 200421 
+AND date >= "2023-10-01" and date <= "2023-10-30"
+--AND date >= "2023-09-01" and date <= "2023-09-30"
+GROUP BY user_id
+)
+,B AS
+(
+SELECT DISTINCT device_id, user_id, DATE as login_date, app_id
+FROM `gamotasdk5.bidata.appsflyer_login_postback`
+WHERE app_id = 200421
+AND date >= "2023-10-01" and date <= "2023-10-30"
+--AND date >= "2023-09-01" and date <= "2023-09-30"
+)
+SELECT distinct A.user_id, B.device_id, A.fdate, A.sdate, B.app_id
+FROM A 
+INNER JOIN B
+ON A.user_id = B.user_id
+WHERE B.app_id = 200421
+--AND B.login_date = A.sdate --ĐÂY LÀ ĐIỀU KIỆN LÀ RR1 HAY LÀ TỬ SỐ, MẪU SỐ THÌ CMT DÒNG NÀY ĐI
+ORDER BY B.device_id DESC, A.user_id
+) 
+AS RAW
+
+
+
